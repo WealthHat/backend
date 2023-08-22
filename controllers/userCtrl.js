@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const { strictRemoveComma } = require("comma-separator");
+const sendEmail = require("../mails/email");
 
 
 //
@@ -20,7 +21,7 @@ const userCtrl = {
       const { firstname, lastname, email, password, role } = req.body;
 
       // check for empty field
-      if (!fullname || !username || !email || !password) {
+      if (!firstname || !lastname || !email || !password) {
         return res.status(400).json({ msg: "Field cannot be empty" });
       }
 
@@ -40,9 +41,9 @@ const userCtrl = {
 
       // create user object
       const newUser = {
-        fullname,
+        firstname,
+        lastname,
         email,
-        username,
         role,
         password: passwordHash,
         code,
@@ -52,8 +53,7 @@ const userCtrl = {
       const activation_token = createActivationToken(newUser);
 
       // send email to the newly registered user
-      // registerMail(email, fullname, code);
-      registerMail(email, fullname, code);
+      sendEmail(email, firstname, code);
 
       // send feedbacl to the client side
       res.json({
