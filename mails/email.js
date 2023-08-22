@@ -2,21 +2,24 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.mandrillapp.com', // Use the Mailchimp SMTP server
-  port: 465, // Use the appropriate port
-  secure: true, // Set to true if the port is 465
+  port: 587, // Use the appropriate port
+  secure: false, // Set to true if the port is 465
   auth: {
     user: 'wealth', // Your Mailchimp username (usually your API key)
-    pass: 'md--3In8449lKd4vCz8TOWalw', // Use an empty string as the password
+    pass: process.env.SMTP_KEY, // Use an empty string as the password
   },
 });
 
 
 const sendEmail = (email, firstname, code) => {
   const mailOptions = {
-    from: 'info@hapartment.org', // Sender's email
+    from: process.env.SENDER_EMAIL, // Sender's email
     to: email, // Recipient's email
-    subject: 'Test Email',
-    text: 'This is a test email sent using Nodemailer and Mailchimp SMTP.',
+    subject: 'welcome to WealthHat',
+    html: `
+     <p>Thank you for joining us</p>
+
+    `,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
