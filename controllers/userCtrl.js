@@ -11,7 +11,7 @@ const sendEmail = require("../mails/email");
 const userCtrl = {
   // register user
 
-  register: async (req, res) => {
+  register: async (req, res) => { 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -77,11 +77,13 @@ const userCtrl = {
         process.env.ACTIVATION_TOKEN_SECRET
       );
 
-      const { fullname, username, email, userType, password, code } = user;
+      const { firstname, lastname, email, password, code } = user;
+
+      console.log(code, auth_code)
 
       // Check the code provided by the user
       if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
-        return res.status(401).json({ msg: "PLease provide a valid code" });
+        return res.status(401).json({ msg: "Please provide a valid code" });
       }
 
       // check if the user already exists in the database
@@ -91,11 +93,10 @@ const userCtrl = {
 
       // Create a new user object to be saved in the user collection
       const newUser = new User({
-        fullname,
-        username,
+        firstname,
+        lastname,
         email,
         password,
-        userType,
       });
 
       await newUser.save();
@@ -364,7 +365,7 @@ const userCtrl = {
 // Activation token
 const createActivationToken = (payload) => {
   return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "25m",
   });
 };
 

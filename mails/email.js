@@ -11,13 +11,13 @@ const transporter = nodemailer.createTransport({
 });
 
 
-const sendEmail = (email, firstname, code) => {
+const  sendEmail = (email, firstname, code) => {
   const mailOptions = {
     from: process.env.SENDER_EMAIL, // Sender's email
     to: email, // Recipient's email
     subject: 'welcome to WealthHat',
     html: `
-     <p>Thank you for joining us</p>
+     <p>${firstname}, Thank you for joining us, Use this code ${code} to activate your account</p>
 
     `,
   };
@@ -25,8 +25,6 @@ const sendEmail = (email, firstname, code) => {
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
     }
   });
 };
