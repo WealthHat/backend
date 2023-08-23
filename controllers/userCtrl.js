@@ -307,63 +307,17 @@ const userCtrl = {
   // update user profile
   updateUser: async (req, res) => {
     try {
-      const { fullname, username, image } = req.body;
+      const { firstname, lastname } = req.body;
 
       await User.findOneAndUpdate(
         { _id: req.user.id },
         {
-          fullname,
-          username,
-          image,
+          firstname,
+          lastname,
         }
       );
 
-      res.json({ msg: 'Account information updated successfully' });
-    } catch (error) {
-      res.status(500).json({ msg: error.message });
-    }
-  },
-
-  // verify agent
-  verifyAgent: async (req, res) => {
-    try {
-      const {
-        identity_name,
-        identity_mobile,
-        identity_selfie,
-        identity_document,
-        document_type,
-      } = req.body;
-
-      if (
-        identity_name === null ||
-        identity_mobile === null ||
-        identity_selfie === null ||
-        identity_document === null ||
-        document_type === null
-      ) {
-        return res
-          .status(400)
-          .json({ msg: 'Please provide necessary informations' });
-      }
-
-      const newData = {
-        identity_name,
-        identity_mobile,
-        identity_selfie,
-        identity_document,
-        document_type,
-        isVerified: 'pending',
-      };
-
-      await User.findOneAndUpdate(
-        { _id: req.user.id },
-        {
-          verification: newData,
-        }
-      );
-
-      res.json({ msg: 'Identity verification successful' });
+      res.json({ msg: 'Profile updated successfully' });
     } catch (error) {
       res.status(500).json({ msg: error.message });
     }
