@@ -18,7 +18,7 @@ router.post("/auth/activate",
 check("code", "Please provide the activation code"),
 userCtrl.authenticate);
 router.post("/auth/resend-code", userCtrl.resend);
-// router.post("/login", userCtrl.login);
+router.post("/auth/signin", userCtrl.login);
 // router.post("/forgotpassword", userCtrl.forgotPassword);
 // router.post("/resetpassword", userCtrl.resetPassword);
 // router.post("/changepassword", auth, userCtrl.changePassword);
