@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const { strictRemoveComma } = require('comma-separator');
 const sendEmail = require('../mails/email');
 const ResendEmail = require('../mails/resend');
+const forgotPasswordEmail = require('../mails/forgotPasswordMail');
 
 //
 
@@ -212,7 +213,7 @@ const userCtrl = {
       // Generate the one-time verication code
 
       const code = Math.floor(
-        Math.random() * (99999999 - 10000000) + 10000000
+        Math.random() * (9999 - 1000) + 1000
       ).toString();
 
       const authorised = {
@@ -224,7 +225,7 @@ const userCtrl = {
       const activation_token = createActivationToken(authorised);
 
       // send email to the user email
-      forgotPasswordMail(email, code);
+      forgotPasswordEmail(email,user.firstname, code);
 
       // send feedback to the user
       res.json({
