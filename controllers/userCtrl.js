@@ -170,9 +170,16 @@ const userCtrl = {
       if (!isMatch) return res.status(400).json({ msg: 'Invalid Credentials' });
 
       // create access token
-      const access_token = createAccessToken({ id: user.id });
+      const token = createAccessToken({ id: user.id });
 
-      res.json({ msg: 'Login successful!', access_token });
+      const userData = {
+        _id : user._id,
+        firstname : user.firstname,
+        lastname : user.lastname,
+        email : user.email
+      }
+
+      res.json({ msg: 'Login successful!', token, user:userData });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
