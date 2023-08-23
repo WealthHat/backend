@@ -20,7 +20,7 @@ userCtrl.authenticate);
 router.post("/auth/resend-code", userCtrl.resend);
 router.post("/auth/signin", userCtrl.login);
 router.post("/auth/forgotpassword", userCtrl.forgotPassword);
-// router.post("/resetpassword", userCtrl.resetPassword);
+router.post("/auth/resetpassword", userCtrl.resetPassword);
 // router.post("/changepassword", auth, userCtrl.changePassword);
 // router.patch("/updateuser", auth, userCtrl.updateUser);
 // router.patch("/verifyagent", auth, userCtrl.verifyAgent);
