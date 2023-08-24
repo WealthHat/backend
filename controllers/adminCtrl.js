@@ -8,6 +8,7 @@ const sendEmail = require('../mails/email');
 const ResendEmail = require('../mails/resend');
 const forgotPasswordEmail = require('../mails/forgotPasswordMail');
 const adminRegisterEmail = require('../mails/admin-register-mail');
+const loginEmail = require('../mails/loginMail');
 
 //
 
@@ -67,6 +68,52 @@ const userCtrl = {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ msg: 'Invalid Credentials' });
 
+      // Generate the one-time verication code
+
+      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
+
+      // create user object
+      const newUser = {
+        username: user.username,
+        email,
+        code,
+      };
+
+      // Create activation token to save the userdata till they are verified
+      const activation_token = createActivationToken(newUser);
+
+      // send email to the newly registered user
+      loginEmail(email, user.username, code);
+
+      // send feedbacl to the client side
+      res.json({
+        msg: 'Please provide the code sent to your email to continue',
+        activation_token,
+      });
+
+ 
+    } catch (error) {
+      return res.status(500).json({ msg: error.message });
+    }
+  },
+
+  authenticateLogin: async (req, res) => {
+    try {
+      const { activation_token, auth_code } = req.body;
+
+      // validate the activation token received
+      const user = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_TOKEN_SECRET
+      );
+
+      const {code } = user;
+
+      // Check the code provided by the user
+      if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
+        return res.status(401).json({ msg: 'Please provide a valid code' });
+      }
+
       // create access token
       const token = createAccessToken({ id: user.id });
 
@@ -78,6 +125,11 @@ const userCtrl = {
 
       res.json({ msg: 'Login successful!', token, user: userData });
     } catch (error) {
+      if (error.message === 'jwt expired') {
+        return res
+          .status(401)
+          .json({ msg: 'Session expired, Login again' });
+      }
       return res.status(500).json({ msg: error.message });
     }
   },
