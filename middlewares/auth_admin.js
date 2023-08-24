@@ -1,26 +1,19 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/adminModel');
+const { userInfo } = require('os');
 
-const auth = (req, res, next) => {
+const authAdmin = (req, res, next) => {
   try {
     const token = req.header('Authorization');
+
     if (!token) return res.status(400).json({ msg: 'Invalid Authentication' });
 
     // validate the jwt
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
       if (err) return res.status(400).json({ msg: 'Invalid Authorization' });
 
-     
-
       const { id } = user;
       Admin.findById(id).then((userdata) => {
-        // check for admin
-        if (userdata.role !== 2) {
-          return res
-            .status(401)
-            .json({ msg: 'Only admin can access this route' });
-        }
-
         req.user = userdata;
         next();
       });
@@ -30,4 +23,4 @@ const auth = (req, res, next) => {
   }
 };
 
-module.exports = auth;
+module.exports = authAdmin;

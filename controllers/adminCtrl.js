@@ -74,6 +74,7 @@ const userCtrl = {
 
       // create user object
       const newUser = {
+        id: user._id,
         username: user.username,
         email,
         code,
@@ -118,7 +119,7 @@ const userCtrl = {
       const token = createAccessToken({ id: user.id });
 
       const userData = {
-        _id: user._id,
+        _id: user.id,
         username: user.username,
         email: user.email,
       };
@@ -133,15 +134,16 @@ const userCtrl = {
       return res.status(500).json({ msg: error.message });
     }
   },
-
+ 
   // get logged in user with the access token created earlier
   getUser: async (req, res) => {
     try {
-      const check = await User.findById(req.user);
+      // console.log(req)
+      const check = await Admin.findById(req.user);
       if (check === null)
         return res.status(400).json({ msg: 'User not found' });
 
-      const user = await User.findById(req.user.id).select('-password');
+      const user = await Admin.findById(req.user.id).select('-password');
       if (!user) return res.status(400).json({ msg: 'User does not exist' });
 
       res.json(user);

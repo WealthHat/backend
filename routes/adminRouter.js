@@ -2,6 +2,8 @@ const router = require("express").Router();
 const { check } = require("express-validator");
 const adminCtrl = require("../controllers/adminCtrl");
 const adminAuth = require("../middlewares/adminAuth");
+const auth = require("../middlewares/auth");
+const authAdmin = require("../middlewares/auth_admin");
 
 // post request
 router.post(
@@ -28,6 +30,6 @@ check("auth_code", "Please provide the code sent to your email").notEmpty(),
 
 
 // get request
-// router.get("/user", auth, userCtrl.getUser);
+router.get("/admin/user", authAdmin, adminCtrl.getUser);
 
 module.exports = router;
