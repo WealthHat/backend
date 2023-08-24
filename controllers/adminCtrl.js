@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Admin = require('../models/adminModel');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
@@ -6,11 +7,12 @@ const { strictRemoveComma } = require('comma-separator');
 const sendEmail = require('../mails/email');
 const ResendEmail = require('../mails/resend');
 const forgotPasswordEmail = require('../mails/forgotPasswordMail');
+const adminRegisterEmail = require('../mails/admin-register-mail');
 
 //
 
 const userCtrl = {
-  // register user
+  // register / create admin
 
   register: async (req, res) => {
     const errors = validationResult(req);
@@ -19,16 +21,11 @@ const userCtrl = {
     }
 
     try {
-      const { firstname, lastname, email, password} = req.body;
-
-      // check for empty field
-      if (!firstname || !lastname || !email || !password) {
-        return res.status(400).json({ msg: 'Field cannot be empty' });
-      }
+      const { username, email, password } = req.body;
 
       // check if the user already exists in the database
-      const user = await User.findOne({ email });
-      if (user)
+      const existing_user = await User.findOne({ email });
+      if (existing_user)
         return res
           .status(400)
           .json({ msg: 'User already exists with the email address' });
@@ -36,29 +33,20 @@ const userCtrl = {
       // password encryption
       const passwordHash = await bcrypt.hash(password, 12);
 
-      // Generate the one-time verication code
-
-      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
-
       // create user object
-      const newUser = {
-        firstname,
-        lastname,
+      const newUser = new Admin({
+        username,
         email,
         password: passwordHash,
-        code,
-      };
-
-      // Create activation token to save the userdata till they are verified
-      const activation_token = createActivationToken(newUser);
+      });
 
       // send email to the newly registered user
-      sendEmail(email, firstname, code);
+      adminRegisterEmail(email, username, password);
+      await newUser.save();
 
       // send feedbacl to the client side
       res.json({
-        msg: 'Registration successful!, please check your mail to activate your account',
-        activation_token,
+        msg: 'Account created successfully!',
       });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
@@ -173,13 +161,13 @@ const userCtrl = {
       const token = createAccessToken({ id: user.id });
 
       const userData = {
-        _id : user._id,
-        firstname : user.firstname,
-        lastname : user.lastname,
-        email : user.email
-      }
+        _id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+      };
 
-      res.json({ msg: 'Login successful!', token, user:userData });
+      res.json({ msg: 'Login successful!', token, user: userData });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
@@ -211,9 +199,7 @@ const userCtrl = {
 
       // Generate the one-time verication code
 
-      const code = Math.floor(
-        Math.random() * (9999 - 1000) + 1000
-      ).toString();
+      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
 
       const authorised = {
         id: user._id,
@@ -224,7 +210,7 @@ const userCtrl = {
       const activation_token = createActivationToken(authorised);
 
       // send email to the user email
-      forgotPasswordEmail(email,user.firstname, code);
+      forgotPasswordEmail(email, user.firstname, code);
 
       // send feedback to the user
       res.json({

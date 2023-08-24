@@ -12,6 +12,7 @@ app.use(cors());
 
 // routes
 app.use('/v1', require('./routes/userRouter'));
+app.use('/v1', require('./routes/adminRouter'));
 
 app.get('/', (req, res) => {
   res.json({ msg: 'Welcome to WealthHat Backend' });
@@ -19,17 +20,7 @@ app.get('/', (req, res) => {
 
 // connect to mongo db
 const URI = process.env.MONGO_URI;
-// mongoose.connect(
-//   URI,
-//   {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   },
-//   (err) => {
-//     if (err) throw err;
-//     console.log("connected to database");
-//   }
-// );
+
 
 mongoose
   .connect(URI, {
