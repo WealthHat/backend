@@ -53,96 +53,6 @@ const userCtrl = {
     }
   },
 
-  // authenticate user with verification code
-
-  authenticate: async (req, res) => {
-    try {
-      const { activation_token, auth_code } = req.body;
-
-      // validate the activation token received
-      const user = jwt.verify(
-        activation_token,
-        process.env.ACTIVATION_TOKEN_SECRET
-      );
-
-      const { firstname, lastname, email, password, code } = user;
-
-      console.log(code, auth_code);
-
-      // Check the code provided by the user
-      if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
-        return res.status(401).json({ msg: 'Please provide a valid code' });
-      }
-
-      // check if the user already exists in the database
-      const checkUser = await User.findOne({ email });
-      if (checkUser)
-        return res.status(400).json({ msg: 'User already exists' });
-
-      // Create a new user object to be saved in the user collection
-      const newUser = new User({
-        firstname,
-        lastname,
-        email,
-        password,
-      });
-
-      await newUser.save();
-      res.json({ msg: 'Your Account has been activated' });
-    } catch (error) {
-      if (error.message === 'jwt expired') {
-        return res
-          .status(401)
-          .json({ msg: 'Session expired, Resend code again' });
-      }
-      return res.status(500).json({ msg: error.message });
-    }
-  },
-
-  // Resend code to the user
-  resend: async (req, res) => {
-    try {
-      const { activation_token } = req.body;
-
-      // Generate the one-time verication code
-
-      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
-
-      // validate the activation token received
-      const user = jwt.verify(
-        activation_token,
-        process.env.ACTIVATION_TOKEN_SECRET
-      );
-
-      const { firstname, email, lastname } = user;
-
-      // create user object
-      const newUser = {
-        firstname,
-        email,
-        lastname,
-        code,
-      };
-
-      // Create activation token to save the userdata till they are verified
-      const activationtoken = createActivationToken(newUser);
-
-      // send email to the newly registered user
-      ResendEmail(email, firstname, code);
-
-      // send feedback to the client side
-      res.json({
-        msg: 'Code sent!, please check your mail to activate your account',
-        activationtoken,
-      });
-    } catch (error) {
-      if (error.message === 'jwt malformed') {
-        return res.status(403).json({ msg: 'Invalid activation code' });
-      }
-      return res.status(500).json({ msg: error.message });
-    }
-  },
-
   // login user
 
   login: async (req, res) => {
@@ -150,8 +60,8 @@ const userCtrl = {
       const { email, password } = req.body;
 
       // check for user in the database
-      const user = await User.findOne({ email });
-      if (!user) return res.status(400).json({ msg: 'Invalid Credentials' });
+      const user = await Admin.findOne({ email });
+      if (!user) return res.status(400).json({ msg: 'Account not found' });
 
       // check the password provided by the user
       const isMatch = await bcrypt.compare(password, user.password);
@@ -162,8 +72,7 @@ const userCtrl = {
 
       const userData = {
         _id: user._id,
-        firstname: user.firstname,
-        lastname: user.lastname,
+        username: user.username,
         email: user.email,
       };
 
