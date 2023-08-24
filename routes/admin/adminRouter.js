@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const { check } = require("express-validator");
-const adminCtrl = require("../controllers/adminCtrl");
-const adminAuth = require("../middlewares/adminAuth");
-const auth = require("../middlewares/auth");
-const authAdmin = require("../middlewares/auth_admin");
+const adminCtrl = require("../../controllers/admin/adminCtrl");
+const adminAuth = require("../../middlewares/adminAuth");
+const auth = require("../../middlewares/auth");
+const authAdmin = require("../../middlewares/auth_admin");
 
 // post request
 router.post(

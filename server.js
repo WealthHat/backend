@@ -11,8 +11,8 @@ app.use(express.json());
 app.use(cors());
 
 // routes
-app.use('/v1', require('./routes/userRouter'));
-app.use('/v1', require('./routes/adminRouter'));
+app.use('/v1', require('./routes/user/userRouter'));
+app.use('/v1', require('./routes/admin/adminRouter'));
 
 app.get('/', (req, res) => {
   res.json({ msg: 'Welcome to WealthHat Backend' });

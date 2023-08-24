@@ -1,19 +1,16 @@
-const User = require('../models/userModel');
-const Admin = require('../models/adminModel');
+const User = require('../../models/user/userModel');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const { strictRemoveComma } = require('comma-separator');
-const sendEmail = require('../mails/email');
-const ResendEmail = require('../mails/resend');
-const forgotPasswordEmail = require('../mails/forgotPasswordMail');
-const adminRegisterEmail = require('../mails/admin-register-mail');
-const loginEmail = require('../mails/loginMail');
+const sendEmail = require('../../mails/email');
+const ResendEmail = require('../../mails/resend');
+const forgotPasswordEmail = require('../../mails/forgotPasswordMail');
 
 //
 
 const userCtrl = {
-  // register / create admin
+  // register user
 
   register: async (req, res) => {
     const errors = validationResult(req);
@@ -22,11 +19,16 @@ const userCtrl = {
     }
 
     try {
-      const { username, email, password } = req.body;
+      const { firstname, lastname, email, password} = req.body;
+
+      // check for empty field
+      if (!firstname || !lastname || !email || !password) {
+        return res.status(400).json({ msg: 'Field cannot be empty' });
+      }
 
       // check if the user already exists in the database
-      const existing_user = await User.findOne({ email });
-      if (existing_user)
+      const user = await User.findOne({ email });
+      if (user)
         return res
           .status(400)
           .json({ msg: 'User already exists with the email address' });
@@ -34,22 +36,121 @@ const userCtrl = {
       // password encryption
       const passwordHash = await bcrypt.hash(password, 12);
 
+      // Generate the one-time verication code
+
+      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
+
       // create user object
-      const newUser = new Admin({
-        username,
+      const newUser = {
+        firstname,
+        lastname,
         email,
         password: passwordHash,
-      });
+        code,
+      };
+
+      // Create activation token to save the userdata till they are verified
+      const activation_token = createActivationToken(newUser);
 
       // send email to the newly registered user
-      adminRegisterEmail(email, username, password);
-      await newUser.save();
+      sendEmail(email, firstname, code);
 
       // send feedbacl to the client side
       res.json({
-        msg: 'Account created successfully!',
+        msg: 'Registration successful!, please check your mail to activate your account',
+        activation_token,
       });
     } catch (error) {
+      return res.status(500).json({ msg: error.message });
+    }
+  },
+
+  // authenticate user with verification code
+
+  authenticate: async (req, res) => {
+    try {
+      const { activation_token, auth_code } = req.body;
+
+      // validate the activation token received
+      const user = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_TOKEN_SECRET
+      );
+
+      const { firstname, lastname, email, password, code } = user;
+
+      console.log(code, auth_code);
+
+      // Check the code provided by the user
+      if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
+        return res.status(401).json({ msg: 'Please provide a valid code' });
+      }
+
+      // check if the user already exists in the database
+      const checkUser = await User.findOne({ email });
+      if (checkUser)
+        return res.status(400).json({ msg: 'User already exists' });
+
+      // Create a new user object to be saved in the user collection
+      const newUser = new User({
+        firstname,
+        lastname,
+        email,
+        password,
+      });
+
+      await newUser.save();
+      res.json({ msg: 'Your Account has been activated' });
+    } catch (error) {
+      if (error.message === 'jwt expired') {
+        return res
+          .status(401)
+          .json({ msg: 'Session expired, Resend code again' });
+      }
+      return res.status(500).json({ msg: error.message });
+    }
+  },
+
+  // Resend code to the user
+  resend: async (req, res) => {
+    try {
+      const { activation_token } = req.body;
+
+      // Generate the one-time verication code
+
+      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
+
+      // validate the activation token received
+      const user = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_TOKEN_SECRET
+      );
+
+      const { firstname, email, lastname } = user;
+
+      // create user object
+      const newUser = {
+        firstname,
+        email,
+        lastname,
+        code,
+      };
+
+      // Create activation token to save the userdata till they are verified
+      const activationtoken = createActivationToken(newUser);
+
+      // send email to the newly registered user
+      ResendEmail(email, firstname, code);
+
+      // send feedback to the client side
+      res.json({
+        msg: 'Code sent!, please check your mail to activate your account',
+        activationtoken,
+      });
+    } catch (error) {
+      if (error.message === 'jwt malformed') {
+        return res.status(403).json({ msg: 'Invalid activation code' });
+      }
       return res.status(500).json({ msg: error.message });
     }
   },
@@ -61,89 +162,37 @@ const userCtrl = {
       const { email, password } = req.body;
 
       // check for user in the database
-      const user = await Admin.findOne({ email });
-      if (!user) return res.status(400).json({ msg: 'Account not found' });
+      const user = await User.findOne({ email });
+      if (!user) return res.status(400).json({ msg: 'Invalid Credentials' });
 
       // check the password provided by the user
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ msg: 'Invalid Credentials' });
 
-      // Generate the one-time verication code
-
-      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
-
-      // create user object
-      const newUser = {
-        id: user._id,
-        username: user.username,
-        email,
-        code,
-      };
-
-      // Create activation token to save the userdata till they are verified
-      const activation_token = createActivationToken(newUser);
-
-      // send email to the newly registered user
-      loginEmail(email, user.username, code);
-
-      // send feedbacl to the client side
-      res.json({
-        msg: 'Please provide the code sent to your email to continue',
-        activation_token,
-      });
-
- 
-    } catch (error) {
-      return res.status(500).json({ msg: error.message });
-    }
-  },
-
-  authenticateLogin: async (req, res) => {
-    try {
-      const { activation_token, auth_code } = req.body;
-
-      // validate the activation token received
-      const user = jwt.verify(
-        activation_token,
-        process.env.ACTIVATION_TOKEN_SECRET
-      );
-
-      const {code } = user;
-
-      // Check the code provided by the user
-      if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
-        return res.status(401).json({ msg: 'Please provide a valid code' });
-      }
-
       // create access token
       const token = createAccessToken({ id: user.id });
 
       const userData = {
-        _id: user.id,
-        username: user.username,
-        email: user.email,
-      };
-
-      res.json({ msg: 'Login successful!', token, user: userData });
-    } catch (error) {
-      if (error.message === 'jwt expired') {
-        return res
-          .status(401)
-          .json({ msg: 'Session expired, Login again' });
+        _id : user._id,
+        firstname : user.firstname,
+        lastname : user.lastname,
+        email : user.email
       }
+
+      res.json({ msg: 'Login successful!', token, user:userData });
+    } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
   },
- 
+
   // get logged in user with the access token created earlier
   getUser: async (req, res) => {
     try {
-      // console.log(req)
-      const check = await Admin.findById(req.user);
+      const check = await User.findById(req.user);
       if (check === null)
         return res.status(400).json({ msg: 'User not found' });
 
-      const user = await Admin.findById(req.user.id).select('-password');
+      const user = await User.findById(req.user.id).select('-password');
       if (!user) return res.status(400).json({ msg: 'User does not exist' });
 
       res.json(user);
@@ -162,7 +211,9 @@ const userCtrl = {
 
       // Generate the one-time verication code
 
-      const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
+      const code = Math.floor(
+        Math.random() * (9999 - 1000) + 1000
+      ).toString();
 
       const authorised = {
         id: user._id,
@@ -173,7 +224,7 @@ const userCtrl = {
       const activation_token = createActivationToken(authorised);
 
       // send email to the user email
-      forgotPasswordEmail(email, user.firstname, code);
+      forgotPasswordEmail(email,user.firstname, code);
 
       // send feedback to the user
       res.json({
