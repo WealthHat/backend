@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { check } = require("express-validator");
 const userCtrl = require("../controllers/userCtrl");
-// const auth = require("../middlewares/auth");
+const auth = require("../middlewares/auth");
 
 // post request
 router.post(
@@ -14,16 +14,20 @@ router.post(
   userCtrl.register
 );
 
-// router.post("/authenticate", userCtrl.authenticate);
-// router.post("/resend", userCtrl.resend);
-// router.post("/login", userCtrl.login);
-// router.post("/forgotpassword", userCtrl.forgotPassword);
-// router.post("/resetpassword", userCtrl.resetPassword);
-// router.post("/changepassword", auth, userCtrl.changePassword);
-// router.patch("/updateuser", auth, userCtrl.updateUser);
-// router.patch("/verifyagent", auth, userCtrl.verifyAgent);
+router.post("/auth/activate", 
+check("code", "Please provide the activation code"),
+userCtrl.authenticate);
+router.post("/auth/resend-code", userCtrl.resend);
+router.post("/auth/signin", userCtrl.login);
+router.post("/auth/forgotpassword", userCtrl.forgotPassword);
+router.post("/auth/resetpassword", userCtrl.resetPassword);
+router.post("/auth/changepassword", auth, userCtrl.changePassword);
+
+// patch request
+router.patch("/user", auth, userCtrl.updateUser);
+
 
 // get request
-// router.get("/user", auth, userCtrl.getUser);
+router.get("/user", auth, userCtrl.getUser);
 
 module.exports = router;

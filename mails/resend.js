@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-const  sendEmail = (email, firstname, code) => {
+const  ResendEmail = (email, firstname, code) => {
   const mailOptions = {
     from: process.env.SENDER_EMAIL, // Sender's email
     to: email, // Recipient's email
@@ -29,4 +29,4 @@ const  sendEmail = (email, firstname, code) => {
   });
 };
 
-module.exports = sendEmail;
+module.exports = ResendEmail;
