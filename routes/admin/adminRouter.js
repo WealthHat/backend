@@ -23,7 +23,10 @@ check("auth_code", "Please provide the code sent to your email").notEmpty(),
  adminCtrl.authenticateLogin);
 // router.post("/auth/forgotpassword", userCtrl.forgotPassword);
 // router.post("/auth/resetpassword", userCtrl.resetPassword);
-// router.post("/auth/changepassword", auth, userCtrl.changePassword);
+router.post("/admin/changepassword",
+check("account_password", "Please provide account password").notEmpty(),
+check("new_password", "Please provide your new password").notEmpty(),
+authAdmin, adminCtrl.changePassword);
 
 // patch request
 // router.patch("/user", auth, userCtrl.updateUser);

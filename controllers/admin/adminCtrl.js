@@ -161,7 +161,6 @@ const userCtrl = {
         return res.status(400).json({ msg: 'This email does not exists' });
 
       // Generate the one-time verication code
-
       const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
 
       const authorised = {
@@ -229,7 +228,7 @@ const userCtrl = {
     try {
       const { account_password, new_password } = req.body;
 
-      const user = await User.findOne({ email: req.user.email });
+      const user = await Admin.findOne({ email: req.user.email });
       if (!user) return res.status(400).json({ msg: 'User not found' });
 
       // check if the password matched
@@ -239,7 +238,7 @@ const userCtrl = {
 
       const passwordHash = await bcrypt.hash(new_password, 12);
 
-      await User.findOneAndUpdate(
+      await Admin.findOneAndUpdate(
         { id: req.user.id },
         {
           password: passwordHash,
