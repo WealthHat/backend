@@ -42,6 +42,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    riskProfile: {
+      type: String,
+      default:"",
+    },
+    profileScore: {
+      type: Number,
+      default:0
+    },
   },
   {
     timestamps: true,

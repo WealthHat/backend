@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema.Types;
 
 const profilingSchema = new mongoose.Schema(
   {
@@ -42,7 +43,10 @@ const profilingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-   
+    createdBy: {
+      type: ObjectId,
+      ref: 'User',
+    },
   },
   {
     timestamps: true,

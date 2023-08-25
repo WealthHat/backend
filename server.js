@@ -11,7 +11,11 @@ app.use(express.json());
 app.use(cors());
 
 // routes
+// ------ user
 app.use('/v1', require('./routes/user/userRouter'));
+app.use('/v1', require('./routes/user/profilingRouter'));
+
+// -------admin
 app.use('/v1', require('./routes/admin/adminRouter'));
 
 app.get('/', (req, res) => {
