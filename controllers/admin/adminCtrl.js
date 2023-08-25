@@ -116,6 +116,7 @@ const userCtrl = {
       }
 
       // create access token
+
       const token = createAccessToken({ id: user.id });
 
       const userData = {
@@ -231,17 +232,20 @@ const userCtrl = {
       const user = await Admin.findOne({ email: req.user.email });
       if (!user) return res.status(400).json({ msg: 'User not found' });
 
+
       // check if the password matched
       const isMatch = await bcrypt.compare(account_password, user.password);
+      console.log(isMatch)
       if (!isMatch)
         return res.status(400).json({ msg: 'Account password is incorrect' });
 
       const passwordHash = await bcrypt.hash(new_password, 12);
 
+    console.log(req.user.id)
       await Admin.findOneAndUpdate(
-        { id: req.user.id },
+        { id: '64e7358248a1e66a10c51cac' },
         {
-          password: passwordHash,
+          password: new_password,
         }
       );
 
