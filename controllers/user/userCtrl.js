@@ -79,7 +79,7 @@ const userCtrl = {
 
       const { firstname, lastname, email, password, code } = user;
 
-      console.log(code, auth_code);
+      
 
       // Check the code provided by the user
       if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
@@ -126,13 +126,14 @@ const userCtrl = {
         process.env.ACTIVATION_TOKEN_SECRET
       );
 
-      const { firstname, email, lastname } = user;
+      const { firstname, email, lastname, password } = user;
 
       // create user object
       const newUser = {
         firstname,
         email,
         lastname,
+        password,
         code,
       };
 
