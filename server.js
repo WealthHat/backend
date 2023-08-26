@@ -14,6 +14,7 @@ app.use(cors());
 // ------ user
 app.use('/v1', require('./routes/user/userRouter'));
 app.use('/v1', require('./routes/user/profilingRouter'));
+app.use('/v1', require('./routes/user/verificationRouter'));
 
 // -------admin
 app.use('/v1', require('./routes/admin/adminRouter'));

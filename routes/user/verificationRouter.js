@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const profilingCtrl = require('../../controllers/user/profilingCtrl');
+const verificationCtrl = require('../../controllers/user/verificationCtrl');
 const auth = require('../../middlewares/auth');
 
 // post request
-router.post('/onboarding/profiling', auth, profilingCtrl.createProfiling);
+router.post('/onboarding/verification', auth, verificationCtrl.verification);
 
 // get request
 // router.get('/user', auth, userCtrl.getUser);

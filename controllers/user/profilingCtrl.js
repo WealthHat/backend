@@ -72,6 +72,7 @@ const profilingCtrl = {
         {
           riskProfile: profile,
           profileScore: response,
+          isProfiled:true
         }
       );
 
