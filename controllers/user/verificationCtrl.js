@@ -5,10 +5,56 @@ const verificationCtrl = {
   // create user profiling
   verification: async (req, res) => {
     try {
-      const { gender, nationality, dob, phone, address } = req.body;
+      const {
+        gender,
+        nationality,
+        dob,
+        phone,
+        address,
+        marital_status,
+        spouse_name,
+        spouse_age,
+        children,
+        children_count,
+        identity_document,
+        address_proof,
+        source_of_wealth,
+        occupation,
+        company_name,
+        next_of_kin_name,
+        next_of_kin_phone,
+        politically_exposed,
+        political_reason,
+        public_positions,
+        public_position_reason,
+        share_info,
+        monitor_account,
+      } = req.body;
+
 
       //    validate for empty fields
-      if (!gender || !nationality || !dob || !phone || !address)
+      if (
+        gender ==="" ||
+        nationality ==="" ||
+        dob ==="" ||
+        phone ==="" ||
+        address ==="" ||
+        marital_status ==="" ||
+        spouse_name ==="" ||
+        spouse_age ==="" ||
+        children ==="" ||
+        identity_document ==="" ||
+        address_proof ==="" ||
+        source_of_wealth ==="" ||
+        occupation ==="" ||
+        company_name ==="" ||
+        next_of_kin_name ==="" ||
+        next_of_kin_phone ==="" ||
+        politically_exposed ==="" ||
+        public_positions ==="" ||
+        share_info ==="" ||
+        monitor_account ===""
+      )
         return res.status(400).json({ msg: 'Field cannot be empty' });
 
       // check if user is logged in
@@ -18,11 +64,9 @@ const verificationCtrl = {
 
       // check if the user has completed his profiling
       if (!user.isProfiled) {
-        return res
-          .status(401)
-          .json({
-            msg: 'Please complete your profiling information before verification',
-          });
+        return res.status(401).json({
+          msg: 'Please complete your profiling information before verification',
+        });
       }
 
       // update user information
@@ -40,6 +84,24 @@ const verificationCtrl = {
         dob,
         phone,
         address,
+        marital_status,
+        spouse_name,
+        spouse_age,
+        children,
+        children_count,
+        identity_document,
+        address_proof,
+        source_of_wealth,
+        occupation,
+        company_name,
+        next_of_kin_name,
+        next_of_kin_phone,
+        politically_exposed,
+        political_reason,
+        public_positions,
+        public_position_reason,
+        share_info,
+        monitor_account,
         createdBy: req.user,
       });
 

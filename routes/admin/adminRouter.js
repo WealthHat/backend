@@ -18,12 +18,12 @@ router.post(
   adminCtrl.register
 );
 
-router.post('/admin/signin', adminCtrl.login);
+router.post('/admin/signin', adminCtrl.login); 
 router.post(
   '/admin/auth-signin',
   check('auth_code', 'Please provide the code sent to your email').notEmpty(),
   adminCtrl.authenticateLogin
-);
+); 
 // router.post("/auth/forgotpassword", userCtrl.forgotPassword);
 // router.post("/auth/resetpassword", userCtrl.resetPassword);
 router.post('/admin/changepassword', authAdmin, adminCtrl.changePassword);
