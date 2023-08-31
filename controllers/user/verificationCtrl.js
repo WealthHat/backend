@@ -1,5 +1,6 @@
 const Verification = require('../../models/user/verificationModel');
 const User = require('../../models/user/userModel');
+const uploadIdentity = require('../../utils/uploadIdentity');
 
 const verificationCtrl = {
   // create user profiling

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
 
 // initiate express
 const app = express();
@@ -9,6 +10,11 @@ const app = express();
 // middlewares
 app.use(express.json());
 app.use(cors());
+app.use(
+  fileUpload({
+    useTempFiles: true,
+  })
+);
 
 // routes
 // ------ user
@@ -18,6 +24,9 @@ app.use('/v1', require('./routes/user/verificationRouter'));
 
 // -------admin
 app.use('/v1', require('./routes/admin/adminRouter'));
+
+// -------upload router
+app.use("/v1", require("./routes/upload"))
 
 app.get('/', (req, res) => {
   res.json({ msg: 'Welcome to WealthHat Backend' });
@@ -39,7 +48,7 @@ mongoose
     console.log(error);
   });
 
-mongoose.set('strictQuery', true);
+// mongoose.set('strictQuery', true);
 
 // port
 const PORT = process.env.PORT || 8000;
