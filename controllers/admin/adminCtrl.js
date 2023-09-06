@@ -1,11 +1,10 @@
 const User = require('../../models/user/userModel');
 const Admin = require('../../models/admin/adminModel');
+const Networth = require('../../models/admin/networthModel');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const { strictRemoveComma } = require('comma-separator');
-const sendEmail = require('../../mails/email');
-const ResendEmail = require('../../mails/resend');
 const forgotPasswordEmail = require('../../mails/forgotPasswordMail');
 const adminRegisterEmail = require('../../mails/admin-register-mail');
 const loginEmail = require('../../mails/loginMail');
@@ -91,8 +90,6 @@ const userCtrl = {
         msg: 'Please provide the code sent to your email to continue',
         activation_token,
       });
-
- 
     } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
@@ -108,7 +105,7 @@ const userCtrl = {
         process.env.ACTIVATION_TOKEN_SECRET
       );
 
-      const {code } = user;
+      const { code } = user;
 
       // Check the code provided by the user
       if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
@@ -128,14 +125,12 @@ const userCtrl = {
       res.json({ msg: 'Login successful!', token, user: userData });
     } catch (error) {
       if (error.message === 'jwt expired') {
-        return res
-          .status(401)
-          .json({ msg: 'Session expired, Login again' });
+        return res.status(401).json({ msg: 'Session expired, Login again' });
       }
       return res.status(500).json({ msg: error.message });
     }
   },
- 
+
   // get logged in user with the access token created earlier
   getUser: async (req, res) => {
     try {
@@ -232,14 +227,12 @@ const userCtrl = {
       const user = await Admin.findOne({ email: req.user.email });
       if (!user) return res.status(400).json({ msg: 'User not found' });
 
-
       // check if the password matched
       const isMatch = await bcrypt.compare(account_password, user.password);
       if (!isMatch)
         return res.status(400).json({ msg: 'Account password is incorrect' });
 
       const passwordHash = await bcrypt.hash(new_password, 12);
-
 
       await Admin.findOneAndUpdate(
         { _id: req.user.id },
@@ -270,6 +263,88 @@ const userCtrl = {
       res.json({ msg: 'Profile updated successfully' });
     } catch (error) {
       res.status(500).json({ msg: error.message });
+    }
+  },
+
+  createNetworth: async (req, res) => {
+    try {
+      const {
+        userId,
+        category,
+        sub_category,
+        assets,
+        current_value_naira,
+        current_value_dollar,
+      } = req.body;
+
+      // check for empty values
+      if (
+        category === '' || !category ||
+        sub_category === '' || !sub_category ||
+        assets === '' || !assets ||
+        current_value_naira === '' || !current_value_naira ||
+        current_value_dollar === '' || !current_value_dollar
+      ) {
+        return res.status(400).json({ msg: 'Inputs cannot be empty' });
+      }
+
+      console.log(req.body)
+
+      // get the user the networth is being created for
+      const user = await User.findById({ _id: userId });
+
+      // save data in the database
+      const networth = new Networth({
+        category,
+        sub_category,
+        assets,
+        current_value_naira,
+        current_value_dollar,
+        user: user,
+      });
+
+      await networth.save()
+
+      res.json({ msg: 'Networth created succcessfully', networth });
+    } catch (error) {
+      res.status(500).json({ msg: error.message });
+    }
+  },
+
+  // =============================================================
+  // ALL SUPER ADMIN CONTROLLERS
+  // update user profile
+  updateAdminRole: async (req, res) => {
+    try {
+      const { admin_id } = req.body;
+
+      await User.findOneAndUpdate(
+        { _id: admin_id },
+        {
+          role: 2,
+        }
+      );
+
+      res.json({ msg: 'Role updated successfully' });
+    } catch (error) {
+      res.status(500).json({ msg: error.message });
+    }
+  },
+
+  // get logged in user with the access token created earlier
+  getAllUser: async (req, res) => {
+    try {
+      // console.log(req)
+      const check = await Admin.findById(req.user);
+      if (check === null)
+        return res.status(400).json({ msg: 'User not found' });
+
+      const user = await User.find().select('-password');
+      if (!user) return res.status(400).json({ msg: 'User does not exist' });
+
+      res.json(user);
+    } catch (error) {
+      return res.status(500).json({ msg: error.message });
     }
   },
 };

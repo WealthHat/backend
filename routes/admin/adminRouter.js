@@ -27,11 +27,17 @@ router.post(
 // router.post("/auth/forgotpassword", userCtrl.forgotPassword);
 // router.post("/auth/resetpassword", userCtrl.resetPassword);
 router.post('/admin/changepassword', authAdmin, adminCtrl.changePassword);
+router.post('/admin/net-worth', authAdmin, adminCtrl.createNetworth);
 
-// patch request
-// router.patch("/user", auth, userCtrl.updateUser);
-
-// get request
 router.get('/admin/user', authAdmin, adminCtrl.getUser);
+
+
+
+
+// ==========================================================
+// super admin routes
+router.patch('/update-role', adminAuth, adminCtrl.updateAdminRole);
+
+router.get('/admin/all-users', adminAuth, adminCtrl.getAllUser); 
 
 module.exports = router;

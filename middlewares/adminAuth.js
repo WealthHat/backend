@@ -15,10 +15,10 @@ const auth = (req, res, next) => {
       const { id } = user;
       Admin.findById(id).then((userdata) => {
         // check for admin
-        if (userdata.role !== 2) {
+        if (userdata.role !== 5) {
           return res
             .status(401)
-            .json({ msg: 'Only admin can access this route' });
+            .json({ msg: 'Only super admin can access this route' });
         }
 
         req.user = userdata;
