@@ -30,6 +30,8 @@ router.post('/admin/changepassword', authAdmin, adminCtrl.changePassword);
 router.post('/admin/net-worth', authAdmin, adminCtrl.createNetworth);
 
 router.get('/admin/user', authAdmin, adminCtrl.getUser);
+router.get('/admin/all-networth', authAdmin, adminCtrl.getAllNetworth);
+router.get('/admin/user-networth/:id', authAdmin, adminCtrl.getUserNetworth);
 
 
 
