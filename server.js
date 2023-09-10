@@ -24,6 +24,8 @@ app.use('/v1', require('./routes/user/verificationRouter'));
 
 // -------admin
 app.use('/v1', require('./routes/admin/adminRouter'));
+app.use('/v1', require('./routes/admin/networthRouter'));
+app.use('/v1', require('./routes/admin/blogRouter'));
 
 // -------upload router
 app.use("/v1", require("./routes/upload"))

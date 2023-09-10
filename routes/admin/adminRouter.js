@@ -2,7 +2,6 @@ const router = require('express').Router();
 const { check } = require('express-validator');
 const adminCtrl = require('../../controllers/admin/adminCtrl');
 const adminAuth = require('../../middlewares/adminAuth');
-const auth = require('../../middlewares/auth');
 const authAdmin = require('../../middlewares/auth_admin');
 
 // post request
@@ -27,14 +26,8 @@ router.post(
 // router.post("/auth/forgotpassword", userCtrl.forgotPassword);
 // router.post("/auth/resetpassword", userCtrl.resetPassword);
 router.post('/admin/changepassword', authAdmin, adminCtrl.changePassword);
-router.post('/admin/net-worth', authAdmin, adminCtrl.createNetworth);
 
 router.get('/admin/user', authAdmin, adminCtrl.getUser);
-router.get('/admin/all-networth', authAdmin, adminCtrl.getAllNetworth);
-router.get('/admin/user-networth/:id', authAdmin, adminCtrl.getUserNetworth);
-
-router.patch('/admin/net-worth', authAdmin, adminCtrl.updateUserNetworth);
-
 
 
 // ==========================================================
