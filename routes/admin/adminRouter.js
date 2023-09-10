@@ -33,6 +33,7 @@ router.get('/admin/user', authAdmin, adminCtrl.getUser);
 router.get('/admin/all-networth', authAdmin, adminCtrl.getAllNetworth);
 router.get('/admin/user-networth/:id', authAdmin, adminCtrl.getUserNetworth);
 
+router.patch('/admin/net-worth', authAdmin, adminCtrl.updateUserNetworth);
 
 
 
@@ -41,5 +42,6 @@ router.get('/admin/user-networth/:id', authAdmin, adminCtrl.getUserNetworth);
 router.patch('/update-role', adminAuth, adminCtrl.updateAdminRole);
 
 router.get('/admin/all-users', adminAuth, adminCtrl.getAllUser); 
+router.get('/admin/all-agents', adminAuth, adminCtrl.getAllUser); 
 
 module.exports = router;
