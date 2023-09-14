@@ -4,10 +4,13 @@ const authAdmin = require('../../middlewares/auth_admin');
 
 router.post('/admin/blog', authAdmin, blogCtrl.createBlog);
 
-// router.get('/admin/all-blog', authAdmin, blogCtrl.getAllblog);
-// router.get('/admin/blog/:id', authAdmin, blogCtrl.getUserblog);
+router.get('/admin/all-blog', authAdmin, blogCtrl.getAllblog);
 
-// router.patch('/admin/blog', authAdmin, blogCtrl.updateUserblog);
+router.get('/admin/blog/:id', authAdmin, blogCtrl.getBlog);
+
+router.patch('/admin/blog', authAdmin, blogCtrl.updateBlog);
+
+router.delete('/admin/blog', authAdmin, blogCtrl.deleteBlog);
 
 
 module.exports = router;
