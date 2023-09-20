@@ -1,4 +1,5 @@
  const Networth = require('../../models/admin/networthModel');
+ const User = require("../../models/user/userModel")
 
 
  const networthCtrl = {
