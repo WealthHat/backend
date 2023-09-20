@@ -5,9 +5,9 @@ const authAdmin = require('../../middlewares/auth_admin');
 router.post('/admin/budget', authAdmin, budgetCtrl.createBudget);
 
 router.get('/admin/all-budget', authAdmin, budgetCtrl.getAllBudget);
-// router.get('/admin/user-networth/:id', authAdmin, budgetCtrl.getUserNetworth);
+router.get('/admin/user-budget/:id', authAdmin, budgetCtrl.getUserBudget);
 
-// router.patch('/admin/net-worth', authAdmin, budgetCtrl.updateUserNetworth);
+router.patch('/admin/budget', authAdmin, budgetCtrl.updateUserBudget);
 
 
 module.exports = router;

@@ -69,72 +69,69 @@
    },
 
   //  // get all net worth
-  //  getUserNetworth: async (req, res) => {
-  //    try {
-  //      // console.log(req)
-  //      const check = await Admin.findById(req.user);
-  //      if (check === null)
-  //        return res.status(400).json({ msg: 'User not found' });
+   getUserBudget: async (req, res) => {
+     try {
 
-  //      const all_networths = await Networth.find();
-  //      if (!all_networths)
-  //        return res.status(400).json({ msg: 'Data does not exist' });
+       const check = await Admin.findById(req.user);
+       if (check === null)
+         return res.status(400).json({ msg: 'User not found' });
 
-  //      // filter through all networths to get single user networths
-  //      const user_networth = all_networths.filter(
-  //        (item) => item.user.toString() === req.params.id
-  //      );
+       const all_budgets = await Budget.find().sort('-createdAt');
+       if (!all_budgets)
+         return res.status(400).json({ msg: 'Data does not exist' });
 
-  //      res.json(user_networth);
-  //    } catch (error) {
-  //      return res.status(500).json({ msg: error.message });
-  //    }
-  //  },
+       // filter through all budget to get single user budget
+       const user_budget = all_budgets.filter(
+         (item) => item.user.toString() === req.params.id
+       );
 
-  //  // update user networth
-  //  updateUserNetworth: async (req, res) => {
-  //    try {
-  //      const {
-  //        id,
-  //        category,
-  //        title,
-  //        assets,
-  //        current_value_naira,
-  //        current_value_dollar,
-  //      } = req.body;
+       res.json(user_budget);
+     } catch (error) {
+       return res.status(500).json({ msg: error.message });
+     }
+   },
 
-  //      // check for empty values
-  //      if (
-  //        category === '' ||
-  //        !category ||
-  //        sub_category === '' ||
-  //        !sub_category ||
-  //        assets === '' ||
-  //        !assets ||
-  //        current_value_naira === '' ||
-  //        !current_value_naira ||
-  //        current_value_dollar === '' ||
-  //        !current_value_dollar
-  //      ) {
-  //        return res.status(400).json({ msg: 'Inputs cannot be empty' });
-  //      }
+  //  // update user budget
+   updateUserBudget: async (req, res) => {
+     try {
+       const {
+         id,
+         category,
+         title,
+         monthly,
+         annually,
+       } = req.body;
 
-  //      await Networth.findOneAndUpdate(
-  //        { _id: id },
-  //        {
-  //          category,
-  //          sub_category,
-  //          assets,
-  //          current_value_naira,
-  //          current_value_dollar,
-  //        }
-  //      );
+       // check for empty values
+       if (
+        id==="" || !id ||
+         category === '' ||
+         !category ||
+         title === '' ||
+         !title ||
+         monthly === '' ||
+         !monthly ||
+         annually === '' ||
+         !annually
+       ) {
+         return res.status(400).json({ msg: 'Inputs cannot be empty' });
+       }
 
-  //      res.json({ msg: 'Networth updated successfully' });
-  //    } catch (error) {
-  //      res.status(500).json({ msg: error.message });
-  //    }
-  //  },
+       await Budget.findOneAndUpdate(
+         { _id: id },
+         {
+          category,
+         title,
+         monthly,
+         annually,
+         }
+       );
+
+       res.json({ msg: 'Budget updated successfully' });
+     } catch (error) {
+       res.status(500).json({ msg: error.message });
+     }
+   },
  };
  
  module.exports = budgetCtrl
