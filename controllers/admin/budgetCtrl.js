@@ -1,5 +1,6 @@
  const Budget = require('../../models/admin/budgetModel');
  const User = require('../../models/user/userModel');
+ const Admin = require('../../models/admin/adminModel');
 
 
  const budgetCtrl = {
@@ -48,22 +49,24 @@
    },
 
   //  // get all net worth
-  //  getAllNetworth: async (req, res) => {
-  //    try {
-  //      // console.log(req)
-  //      const check = await Admin.findById(req.user);
-  //      if (check === null)
-  //        return res.status(400).json({ msg: 'User not found' });
+   getAllBudget: async (req, res) => {
+     try {
+       // console.log(req)
+       const check = await Admin.findById(req.user);
+       if (check === null)
+         return res.status(400).json({ msg: 'User not found' });
 
-  //      const networths = await Networth.find();
-  //      if (!networths)
-  //        return res.status(400).json({ msg: 'Data does not exist' });
+       const budget = await Budget.find()
+         .populate('user', '_id firstname lastname email')
+         .sort('-createdAt');
+       if (!budget)
+         return res.status(400).json({ msg: 'Data does not exist' });
 
-  //      res.json(networths);
-  //    } catch (error) {
-  //      return res.status(500).json({ msg: error.message });
-  //    }
-  //  },
+       res.json(budget);
+     } catch (error) {
+       return res.status(500).json({ msg: error.message });
+     }
+   },
 
   //  // get all net worth
   //  getUserNetworth: async (req, res) => {
