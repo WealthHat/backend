@@ -27,6 +27,7 @@ app.use('/v1', require('./routes/admin/adminRouter'));
 app.use('/v1', require('./routes/admin/networthRouter'));
 app.use('/v1', require('./routes/admin/blogRouter'));
 app.use('/v1', require('./routes/admin/budgetRouter'));
+app.use('/v1', require('./routes/admin/performanceRouter'));
 
 // -------upload router
 app.use("/v1", require("./routes/upload"))
