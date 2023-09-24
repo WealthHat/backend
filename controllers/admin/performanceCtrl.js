@@ -1,6 +1,8 @@
 //  const Networth = require('../../models/admin/networthModel');
  const Performance = require('../../models/admin/performanceModel');
  const User = require("../../models/user/userModel")
+  const Admin = require('../../models/admin/adminModel');
+
 
 
  const performanceCtrl = {
@@ -69,22 +71,22 @@
    },
 
   //  // get all net worth
-  //  getAllPerformance: async (req, res) => {
-  //    try {
-  //      // console.log(req)
-  //      const check = await Admin.findById(req.user);
-  //      if (check === null)
-  //        return res.status(400).json({ msg: 'User not found' });
+   getAllPerformance: async (req, res) => {
+     try {
+       // console.log(req)
+       const check = await Admin.findById(req.user);
+       if (check === null)
+         return res.status(400).json({ msg: 'User not found' });
 
-  //      const networths = await Networth.find();
-  //      if (!networths)
-  //        return res.status(400).json({ msg: 'Data does not exist' });
+       const performance = await Performance.find();
+       if (!performance)
+         return res.status(400).json({ msg: 'Data does not exist' });
 
-  //      res.json(networths);
-  //    } catch (error) {
-  //      return res.status(500).json({ msg: error.message });
-  //    }
-  //  },
+       res.json(performance);
+     } catch (error) {
+       return res.status(500).json({ msg: error.message });
+     }
+   },
 
   //  // get all net worth
   //  getUserPerformance: async (req, res) => {
