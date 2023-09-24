@@ -60,7 +60,9 @@ const Networth = require('../../models/admin/networthModel');
        if (check === null)
          return res.status(400).json({ msg: 'User not found' });
 
-       const networths = await Networth.find();
+       const networths = await Networth.find()
+         .populate('user', '_id firstname lastname email')
+         .sort('-createdAt');;
        if (!networths)
          return res.status(400).json({ msg: 'Data does not exist' });
 
@@ -78,7 +80,9 @@ const Networth = require('../../models/admin/networthModel');
        if (check === null)
          return res.status(400).json({ msg: 'User not found' });
 
-       const all_networths = await Networth.find();
+       const all_networths = await Networth.find()
+         .populate('user', '_id firstname lastname email')
+         .sort('-createdAt');;
        if (!all_networths)
          return res.status(400).json({ msg: 'Data does not exist' });
 

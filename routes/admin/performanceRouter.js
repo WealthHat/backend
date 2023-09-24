@@ -5,9 +5,9 @@ const authAdmin = require('../../middlewares/auth_admin');
 router.post('/admin/performance', authAdmin, performanceCtrl.createPerformance);
 
 router.get('/admin/all-performance', authAdmin, performanceCtrl.getAllPerformance);
-// router.get('/admin/user-performance/:id', authAdmin, performanceCtrl.getUserPerformance);
+router.get('/admin/user-performance/:id', authAdmin, performanceCtrl.getUserPerformance);
 
-// router.patch('/admin/performance', authAdmin, performanceCtrl.updateUserPerformance);
+router.patch('/admin/performance', authAdmin, performanceCtrl.updateUserPerformance);
 
 
 module.exports = router;
