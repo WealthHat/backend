@@ -1,14 +1,14 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
+const User = require("../models/user/userModel");
 
 const auth = (req, res, next) => {
   try {
     const token = req.header("Authorization");
-    if (!token) return res.status(400).json({ msg: "Invalid Authentication" });
+    if (!token) return res.status(401).json({ msg: "Invalid Authentication" });
 
     // validate the jwt
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) return res.status(400).json({ msg: "Invalid Authorization" });
+      if (err) return res.status(401).json({ msg: "Invalid Authorization" });
 
       const { id } = user;
       User.findById(id).then((userdata) => {

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { check } = require("express-validator");
-const userCtrl = require("../controllers/userCtrl");
-const auth = require("../middlewares/auth");
+const userCtrl = require("../../controllers/user/userCtrl");
+const auth = require("../../middlewares/auth");
 
 // post request
 router.post(

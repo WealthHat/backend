@@ -24,8 +24,31 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      trim: true,
-    }
+    },
+    isProfiled: {
+      type: Boolean,
+      default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isActivated: {
+      type: Boolean,
+      default: false,
+    },
+    isOnboarded: {
+      type: Boolean,
+      default: false,
+    },
+    riskProfile: {
+      type: String,
+      default:"",
+    },
+    profileScore: {
+      type: Number,
+      default:0
+    },
   },
   {
     timestamps: true,

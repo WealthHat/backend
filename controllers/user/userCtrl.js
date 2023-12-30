@@ -1,11 +1,11 @@
-const User = require('../models/userModel');
+const User = require('../../models/user/userModel');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const { strictRemoveComma } = require('comma-separator');
-const sendEmail = require('../mails/email');
-const ResendEmail = require('../mails/resend');
-const forgotPasswordEmail = require('../mails/forgotPasswordMail');
+const sendEmail = require('../../mails/email');
+const ResendEmail = require('../../mails/resend');
+const forgotPasswordEmail = require('../../mails/forgotPasswordMail');
 
 //
 
@@ -19,7 +19,7 @@ const userCtrl = {
     }
 
     try {
-      const { firstname, lastname, email, password, role } = req.body;
+      const { firstname, lastname, email, password} = req.body;
 
       // check for empty field
       if (!firstname || !lastname || !email || !password) {
@@ -45,7 +45,6 @@ const userCtrl = {
         firstname,
         lastname,
         email,
-        role,
         password: passwordHash,
         code,
       };
@@ -80,7 +79,7 @@ const userCtrl = {
 
       const { firstname, lastname, email, password, code } = user;
 
-      console.log(code, auth_code);
+      
 
       // Check the code provided by the user
       if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
@@ -127,13 +126,14 @@ const userCtrl = {
         process.env.ACTIVATION_TOKEN_SECRET
       );
 
-      const { firstname, email, lastname } = user;
+      const { firstname, email, lastname, password } = user;
 
       // create user object
       const newUser = {
         firstname,
         email,
         lastname,
+        password,
         code,
       };
 
@@ -292,9 +292,9 @@ const userCtrl = {
       const passwordHash = await bcrypt.hash(new_password, 12);
 
       await User.findOneAndUpdate(
-        { id: req.user.id },
+        { _id: req.user.id },
         {
-          password: passwordHash,
+          password: new_password,
         }
       );
 
