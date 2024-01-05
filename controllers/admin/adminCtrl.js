@@ -1,12 +1,12 @@
-const User = require('../../models/user/userModel');
-const Admin = require('../../models/admin/adminModel');
-const jwt = require('jsonwebtoken');
-const { validationResult } = require('express-validator');
-const bcrypt = require('bcrypt');
-const { strictRemoveComma } = require('comma-separator');
-const forgotPasswordEmail = require('../../mails/forgotPasswordMail');
-const adminRegisterEmail = require('../../mails/admin-register-mail');
-const loginEmail = require('../../mails/loginMail');
+const User = require("../../models/user/userModel");
+const Admin = require("../../models/admin/adminModel");
+const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
+const bcrypt = require("bcrypt");
+const { strictRemoveComma } = require("comma-separator");
+const forgotPasswordEmail = require("../../mails/forgotPasswordMail");
+const adminRegisterEmail = require("../../mails/admin-register-mail");
+const loginEmail = require("../../mails/loginMail");
 
 //
 
@@ -27,7 +27,7 @@ const userCtrl = {
       if (existing_user)
         return res
           .status(400)
-          .json({ msg: 'User already exists with the email address' });
+          .json({ msg: "User already exists with the email address" });
 
       // password encryption
       const passwordHash = await bcrypt.hash(password, 12);
@@ -45,7 +45,7 @@ const userCtrl = {
 
       // send feedbacl to the client side
       res.json({
-        msg: 'Account created successfully!',
+        msg: "Account created successfully!",
       });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
@@ -60,11 +60,12 @@ const userCtrl = {
 
       // check for user in the database
       const user = await Admin.findOne({ email });
-      if (!user) return res.status(400).json({ msg: 'Account not found' });
+      if (!user) return res.status(400).json({ msg: "Account not found" });
 
       // check the password provided by the user
+
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return res.status(400).json({ msg: 'Invalid Credentials' });
+      if (!isMatch) return res.status(400).json({ msg: "Invalid Credentials" });
 
       // Generate the one-time verication code
 
@@ -86,7 +87,7 @@ const userCtrl = {
 
       // send feedbacl to the client side
       res.json({
-        msg: 'Please provide the code sent to your email to continue',
+        msg: "Please provide the code sent to your email to continue",
         activation_token,
       });
     } catch (error) {
@@ -108,7 +109,7 @@ const userCtrl = {
 
       // Check the code provided by the user
       if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
-        return res.status(401).json({ msg: 'Please provide a valid code' });
+        return res.status(401).json({ msg: "Please provide a valid code" });
       }
 
       // create access token
@@ -121,10 +122,10 @@ const userCtrl = {
         email: user.email,
       };
 
-      res.json({ msg: 'Login successful!', token, user: userData });
+      res.json({ msg: "Login successful!", token, user: userData });
     } catch (error) {
-      if (error.message === 'jwt expired') {
-        return res.status(401).json({ msg: 'Session expired, Login again' });
+      if (error.message === "jwt expired") {
+        return res.status(401).json({ msg: "Session expired, Login again" });
       }
       return res.status(500).json({ msg: error.message });
     }
@@ -136,10 +137,10 @@ const userCtrl = {
       // console.log(req)
       const check = await Admin.findById(req.user);
       if (check === null)
-        return res.status(400).json({ msg: 'User not found' });
+        return res.status(400).json({ msg: "User not found" });
 
-      const user = await Admin.findById(req.user.id).select('-password');
-      if (!user) return res.status(400).json({ msg: 'User does not exist' });
+      const user = await Admin.findById(req.user.id).select("-password");
+      if (!user) return res.status(400).json({ msg: "User does not exist" });
 
       res.json(user);
     } catch (error) {
@@ -151,9 +152,9 @@ const userCtrl = {
   forgotPassword: async (req, res) => {
     try {
       const { email } = req.body;
-      const user = await User.findOne({ email });
+      const user = await Admin.findOne({ email });
       if (!user)
-        return res.status(400).json({ msg: 'This email does not exists' });
+        return res.status(400).json({ msg: "This email does not exists" });
 
       // Generate the one-time verication code
       const code = Math.floor(Math.random() * (9999 - 1000) + 1000).toString();
@@ -167,11 +168,11 @@ const userCtrl = {
       const activation_token = createActivationToken(authorised);
 
       // send email to the user email
-      forgotPasswordEmail(email, user.firstname, code);
+      forgotPasswordEmail(email, user.username, code);
 
       // send feedback to the user
       res.json({
-        msg: 'Please check your mail to get your one time code',
+        msg: "Please check your mail to get your one time code",
         activation_token,
       });
     } catch (error) {
@@ -194,24 +195,24 @@ const userCtrl = {
 
       // Check the code provided by the user
       if (strictRemoveComma(auth_code) !== strictRemoveComma(code)) {
-        return res.status(401).json({ msg: 'Invalid code' });
+        return res.status(401).json({ msg: "Invalid code" });
       }
 
       const passwordHash = await bcrypt.hash(password, 12);
 
-      await User.findOneAndUpdate(
-        { id: id },
+      await Admin.findOneAndUpdate(
+        { _id: id },
         {
           password: passwordHash,
         }
       );
 
-      res.json({ msg: 'Password successfully changed!' });
+      res.json({ msg: "Password successfully changed!" });
     } catch (error) {
-      if (error.message === 'jwt expired') {
+      if (error.message === "jwt expired") {
         return res
           .status(401)
-          .json({ msg: 'Session expired, Please try again' });
+          .json({ msg: "Session expired, Please try again" });
       }
 
       return res.status(500).json({ msg: error.message });
@@ -224,12 +225,12 @@ const userCtrl = {
       const { account_password, new_password } = req.body;
 
       const user = await Admin.findOne({ email: req.user.email });
-      if (!user) return res.status(400).json({ msg: 'User not found' });
+      if (!user) return res.status(400).json({ msg: "User not found" });
 
       // check if the password matched
       const isMatch = await bcrypt.compare(account_password, user.password);
       if (!isMatch)
-        return res.status(400).json({ msg: 'Account password is incorrect' });
+        return res.status(400).json({ msg: "Account password is incorrect" });
 
       const passwordHash = await bcrypt.hash(new_password, 12);
 
@@ -240,7 +241,7 @@ const userCtrl = {
         }
       );
 
-      res.json({ msg: 'Password successfully changed!' });
+      res.json({ msg: "Password successfully changed!" });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
@@ -259,7 +260,7 @@ const userCtrl = {
         }
       );
 
-      res.json({ msg: 'Profile updated successfully' });
+      res.json({ msg: "Profile updated successfully" });
     } catch (error) {
       res.status(500).json({ msg: error.message });
     }
@@ -276,7 +277,7 @@ const userCtrl = {
         }
       );
 
-      res.json({ msg: 'Role updated successfully' });
+      res.json({ msg: "Role updated successfully" });
     } catch (error) {
       res.status(500).json({ msg: error.message });
     }
@@ -287,10 +288,10 @@ const userCtrl = {
       // console.log(req)
       const check = await Admin.findById(req.user);
       if (check === null)
-        return res.status(400).json({ msg: 'User not found' });
+        return res.status(400).json({ msg: "User not found" });
 
-      const user = await User.find().select('-password');
-      if (!user) return res.status(400).json({ msg: 'User does not exist' });
+      const user = await User.find().select("-password");
+      if (!user) return res.status(400).json({ msg: "User does not exist" });
 
       res.json(user);
     } catch (error) {
@@ -303,10 +304,10 @@ const userCtrl = {
       // console.log(req)
       const check = await Admin.findById(req.user);
       if (check === null)
-        return res.status(400).json({ msg: 'User not found' });
+        return res.status(400).json({ msg: "User not found" });
 
-      const agent = await Admin.find().select('-password');
-      if (!user) return res.status(400).json({ msg: 'Agent does not exist' });
+      const agent = await Admin.find().select("-password");
+      if (!user) return res.status(400).json({ msg: "Agent does not exist" });
 
       res.json(agent);
     } catch (error) {
@@ -319,14 +320,14 @@ const userCtrl = {
 // Activation token
 const createActivationToken = (payload) => {
   return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET, {
-    expiresIn: '1d',
+    expiresIn: "1d",
   });
 };
 
 // Access token
 const createAccessToken = (payload) => {
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '1d',
+    expiresIn: "1d",
   });
 };
 
