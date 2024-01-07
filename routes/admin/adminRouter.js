@@ -25,15 +25,15 @@ router.post(
 );
 router.post("/admin/forgotpassword", adminCtrl.forgotPassword);
 router.post("/admin/resetpassword", adminCtrl.resetPassword);
+router.post("/admin/changepassword", authAdmin, adminCtrl.changePassword);
 
+// get requests
 router.get("/admin/user", authAdmin, adminCtrl.getUser);
+router.get("/admin/dashboard-count", authAdmin, adminCtrl.getDashboardCount);
 
 // ==========================================================
 // super admin routes
 router.patch("/update-role", adminAuth, adminCtrl.updateAdminRole);
-
-router.post("/admin/changepassword", authAdmin, adminCtrl.changePassword);
-
 router.get("/admin/all-users", adminAuth, adminCtrl.getAllUser);
 router.get("/admin/all-agents", adminAuth, adminCtrl.getAllUser);
 

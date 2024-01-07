@@ -1,5 +1,9 @@
 const User = require("../../models/user/userModel");
 const Admin = require("../../models/admin/adminModel");
+const Budget = require("../../models/admin/budgetModel");
+const Networth = require("../../models/admin/networthModel");
+const Performance = require("../../models/admin/performanceModel");
+const Blog = require("../../models/admin/blogModel");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
@@ -80,16 +84,26 @@ const userCtrl = {
       };
 
       // Create activation token to save the userdata till they are verified
-      const activation_token = createActivationToken(newUser);
+      // const activation_token = createActivationToken(newUser);
 
-      // send email to the newly registered user
-      loginEmail(email, user.username, code);
+      // // send email to the newly registered user
+      // loginEmail(email, user.username, code);
 
-      // send feedbacl to the client side
-      res.json({
-        msg: "Please provide the code sent to your email to continue",
-        activation_token,
-      });
+      // // send feedbacl to the client side
+      // res.json({
+      //   msg: "Please provide the code sent to your email to continue",
+      //   activation_token,
+      // });
+
+      const token = createAccessToken({ id: user._id });
+
+      const userData = {
+        _id: user._id,
+        username: user.username,
+        email,
+      };
+
+      res.json({ msg: "Login successful!", data: { token, user: userData } });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
@@ -294,6 +308,38 @@ const userCtrl = {
       if (!user) return res.status(400).json({ msg: "User does not exist" });
 
       res.json(user);
+    } catch (error) {
+      return res.status(500).json({ msg: error.message });
+    }
+  },
+
+  getDashboardCount: async (req, res) => {
+    try {
+      const check = await Admin.findById(req.user);
+      if (check === null)
+        return res.status(400).json({ msg: "Agent not found" });
+
+      const blogs = await Blog.find();
+      const networth = await Networth.find();
+      const budget = await Budget.find();
+      const performance = await Performance.find();
+      const user = await User.find().select("-password");
+      const agent = await Admin.find().select("-password");
+
+      // get only the last 5 newly registered users
+      const newUser = user.slice(0, 5);
+
+      res.json({
+        count: {
+          blogs: blogs.length,
+          networth: networth.length,
+          budget: budget.length,
+          performance: performance.length,
+          users: user.length,
+          agents: agent.length,
+        },
+        users: newUser,
+      });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
