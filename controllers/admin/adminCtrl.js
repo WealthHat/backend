@@ -84,26 +84,26 @@ const userCtrl = {
       };
 
       // Create activation token to save the userdata till they are verified
-      // const activation_token = createActivationToken(newUser);
+      const activation_token = createActivationToken(newUser);
 
-      // // send email to the newly registered user
-      // loginEmail(email, user.username, code);
+      // send email to the newly registered user
+      loginEmail(email, user.username, code);
 
-      // // send feedbacl to the client side
-      // res.json({
-      //   msg: "Please provide the code sent to your email to continue",
-      //   activation_token,
-      // });
+      // send feedbacl to the client side
+      res.json({
+        msg: "Please provide the code sent to your email to continue",
+        activation_token,
+      });
 
-      const token = createAccessToken({ id: user._id });
+      // const token = createAccessToken({ id: user._id });
 
-      const userData = {
-        _id: user._id,
-        username: user.username,
-        email,
-      };
+      // const userData = {
+      //   _id: user._id,
+      //   username: user.username,
+      //   email,
+      // };
 
-      res.json({ msg: "Login successful!", data: { token, user: userData } });
+      // res.json({ msg: "Login successful!", data: { token, user: userData } });
     } catch (error) {
       return res.status(500).json({ msg: error.message });
     }
@@ -136,7 +136,7 @@ const userCtrl = {
         email: user.email,
       };
 
-      res.json({ msg: "Login successful!", token, user: userData });
+      res.json({ msg: "Login successful!", data: { token, user: userData } });
     } catch (error) {
       if (error.message === "jwt expired") {
         return res.status(401).json({ msg: "Session expired, Login again" });

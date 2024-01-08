@@ -9,7 +9,7 @@ const networthCtrl = {
       const {
         userId,
         category,
-        sub_category,
+        type,
         assets,
         current_value_naira,
         current_value_dollar,
@@ -17,10 +17,11 @@ const networthCtrl = {
 
       // check for empty values
       if (
+        !userId ||
         category === "" ||
         !category ||
-        sub_category === "" ||
-        !sub_category ||
+        type === "" ||
+        !type ||
         assets === "" ||
         !assets ||
         current_value_naira === "" ||
@@ -37,7 +38,7 @@ const networthCtrl = {
       // save data in the database
       const networth = new Networth({
         category,
-        sub_category,
+        type,
         assets,
         current_value_naira,
         current_value_dollar,
@@ -75,11 +76,6 @@ const networthCtrl = {
   // get all net worth
   getUserNetworth: async (req, res) => {
     try {
-      // console.log(req)
-      const check = await Admin.findById(req.user);
-      if (check === null)
-        return res.status(400).json({ msg: "User not found" });
-
       const all_networths = await Networth.find()
         .populate("user", "_id firstname lastname email")
         .sort("-createdAt");
@@ -88,7 +84,8 @@ const networthCtrl = {
 
       // filter through all networths to get single user networths
       const user_networth = all_networths.filter(
-        (item) => item.user.toString() === req.params.id
+        // (item) => console.log(item.user.toString(), req.params.id)
+        (item) => item.user._id.toString() === req.params.id
       );
 
       res.json(user_networth);
